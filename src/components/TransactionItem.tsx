@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useHistory } from "react-router";
 import {
   ListItem,
@@ -12,11 +12,17 @@ import {
   Theme,
   createStyles,
   makeStyles,
+  Button,
 } from "@material-ui/core";
-import { ThumbUpAltOutlined as LikeIcon, CommentRounded as CommentIcon } from "@material-ui/icons";
+import {
+  ThumbUpAltOutlined as LikeIcon,
+  CommentRounded as CommentIcon,
+  MonetizationOn as MonetizationOn,
+} from "@material-ui/icons";
 import { TransactionResponseItem } from "../models";
 import TransactionTitle from "./TransactionTitle";
 import TransactionAmount from "./TransactionAmount";
+import Delayed from "./Delayed";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -44,6 +50,19 @@ const useStyles = makeStyles((theme) => ({
     height: theme.spacing(2),
     width: theme.spacing(2),
   },
+  selectTransactionsButton: {
+    fontSize: 16,
+    backgroundColor: "#800080",
+    paddingTop: 5,
+    paddingBottom: 5,
+    paddingRight: 20,
+    fontWeight: "bold",
+    "&:hover": {
+      backgroundColor: "#CBC3E3",
+      borderColor: "#800080",
+      boxShadow: "none",
+    },
+  },
 }));
 
 type TransactionProps = {
@@ -65,72 +84,99 @@ const TransactionItem: React.FC<TransactionProps> = ({ transaction }) => {
   const history = useHistory();
 
   const showTransactionDetail = (transactionId: string) => {
-    history.push(`/transaction/${transactionId}`);
+    if (idChecked) {
+      history.push(`/transaction/${transactionId}`);
+    }
   };
 
+  const [idChecked, setIdChecked] = useState<string>();
+
   return (
-    <ListItem
-      data-test={`transaction-item-${transaction.id}`}
-      alignItems="flex-start"
-      onClick={() => showTransactionDetail(transaction.id)}
-    >
-      <Paper className={classes.paper} elevation={0}>
-        <Grid container spacing={2}>
-          <Grid item>
-            <ListItemAvatar>
-              <Badge
-                overlap="circle"
-                anchorOrigin={{
-                  vertical: "bottom",
-                  horizontal: "right",
-                }}
-                badgeContent={<SmallAvatar src={transaction.receiverAvatar} />}
-              >
-                <Avatar src={transaction.senderAvatar} />
-              </Badge>
-            </ListItemAvatar>
-          </Grid>
-          <Grid item xs={12} sm container>
-            <Grid item xs container direction="column" spacing={2}>
-              <Grid item xs>
-                <TransactionTitle transaction={transaction} />
-                <Typography variant="body2" color="textSecondary" gutterBottom>
-                  {transaction.description}
-                </Typography>
-                <Grid
-                  container
-                  direction="row"
-                  justify="flex-start"
-                  alignItems="flex-start"
-                  spacing={1}
-                  className={classes.socialStats}
+    <Delayed>
+      <ListItem
+        data-test={`transaction-item-${transaction.id}`}
+        alignItems="flex-start"
+        onClick={() => showTransactionDetail(transaction.id)}
+      >
+        <Paper className={classes.paper} elevation={0}>
+          <Grid container spacing={2}>
+            <Grid item>
+              <ListItemAvatar>
+                <Badge
+                  overlap="circle"
+                  anchorOrigin={{
+                    vertical: "bottom",
+                    horizontal: "right",
+                  }}
+                  badgeContent={<SmallAvatar src={transaction.receiverAvatar} />}
                 >
-                  <Grid item>
-                    <LikeIcon className={classes.countIcons} />
-                  </Grid>
-                  <Grid item>
-                    <Typography data-test="transaction-like-count" className={classes.countText}>
-                      {transaction.likes.length}
-                    </Typography>
-                  </Grid>
-                  <Grid item>
-                    <CommentIcon className={classes.countIcons} />
-                  </Grid>
-                  <Grid item>
-                    <Typography data-test="transaction-comment-count" className={classes.countText}>
-                      {transaction.comments.length}
-                    </Typography>
+                  <Avatar src={transaction.senderAvatar} />
+                </Badge>
+              </ListItemAvatar>
+            </Grid>
+            <Grid item xs={12} sm container>
+              <Grid item xs container direction="column" spacing={2}>
+                <Grid item xs>
+                  <TransactionTitle transaction={transaction} />
+                  <Typography variant="body2" color="textSecondary" gutterBottom>
+                    {transaction.description}
+                  </Typography>
+                  <Grid
+                    container
+                    direction="row"
+                    justify="flex-start"
+                    alignItems="flex-start"
+                    spacing={1}
+                    className={classes.socialStats}
+                  >
+                    <Grid item>
+                      <LikeIcon className={classes.countIcons} />
+                    </Grid>
+                    <Grid item>
+                      <Typography data-test="transaction-like-count" className={classes.countText}>
+                        {transaction.likes.length}
+                      </Typography>
+                    </Grid>
+                    <Grid item>
+                      <CommentIcon className={classes.countIcons} />
+                    </Grid>
+                    <Grid item>
+                      <Typography
+                        data-test="transaction-comment-count"
+                        className={classes.countText}
+                      >
+                        {transaction.comments.length}
+                      </Typography>
+                    </Grid>
+                    <Grid item>
+                      <input
+                        type="checkbox"
+                        defaultChecked={false}
+                        onChange={() => setIdChecked("test")}
+                      />
+                    </Grid>
+                    <Grid item>
+                      <Button
+                        className={classes.selectTransactionsButton}
+                        variant="contained"
+                        color="inherit"
+                        // onClick={() => showTransactionDetail(transaction.id)}
+                        data-test="nav-top-new-transaction"
+                      >
+                        <MonetizationOn /> Select
+                      </Button>
+                    </Grid>
                   </Grid>
                 </Grid>
               </Grid>
-            </Grid>
-            <Grid item>
-              <TransactionAmount transaction={transaction} />
+              <Grid item>
+                <TransactionAmount transaction={transaction} />
+              </Grid>
             </Grid>
           </Grid>
-        </Grid>
-      </Paper>
-    </ListItem>
+        </Paper>
+      </ListItem>
+    </Delayed>
   );
 };
 

@@ -6,8 +6,12 @@ import {
   TransactionDateRangePayload,
   TransactionAmountRangePayload,
 } from "../models";
+import { Link as RouterLink } from "react-router-dom";
 import TransactionList from "./TransactionList";
 import { publicTransactionsMachine } from "../machines/publicTransactionsMachine";
+import { makeStyles, Button } from "@material-ui/core";
+import { BarChart as BarChartIcon } from "@material-ui/icons";
+import { debounce } from "lodash/fp";
 
 export interface TransactionPublicListProps {
   filterComponent: ReactNode;
@@ -30,11 +34,14 @@ const TransactionPublicList: React.FC<TransactionPublicListProps> = ({
   }
 
   useEffect(() => {
-    send("FETCH", { ...dateRangeFilters, ...amountRangeFilters });
+    setTimeout(() => {
+      send("FETCH", { ...dateRangeFilters, ...amountRangeFilters });
+    }, 1000);
   }, [send, dateRangeFilters, amountRangeFilters]);
 
-  const loadNextPage = (page: number) =>
-    send("FETCH", { page, ...dateRangeFilters, ...amountRangeFilters });
+  const loadNextPage = debounce(3000, (page: number) =>
+    send("FETCH", { page, ...dateRangeFilters, ...amountRangeFilters })
+  );
 
   return (
     <>

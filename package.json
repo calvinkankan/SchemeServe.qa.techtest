@@ -185,7 +185,7 @@
     "prebuild": "yarn types",
     "prebuild:ci": "yarn predev:cognito:ci",
     "build:ci": "cross-env CYPRESS_COVERAGE=true vite build",
-    "build": "vite build",
+    "build": "vite build && cp -r data ./build",
     "codesandbox:start:api": "yarn tsnode:not-instrumented --files backend/app.ts",
     "codesandbox:start": "NODE_ENV=development TSC_COMPILE_ON_ERROR=true concurrently \"vite\" yarn:start:api:codesandbox",
     "postinstall": "husky install && patch-package"
